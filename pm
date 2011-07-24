@@ -31,6 +31,7 @@
 
 pm_version=0.1.3
 basepath="/usr/ports"
+uid=`whoami`
 
 usage() {
     echo -e "usage: pm [-hv]\n"\
@@ -62,6 +63,13 @@ pm_search4port() {
     fi
     cd "$basepath"
     cd "$1"
+}
+
+pm_checkprivileges() {
+    if [ "$uid" != "root" ]; then
+        echo "You have to be root to perform this action."
+        exit 3;
+    fi
 }
 
 pm_help() {
@@ -103,7 +111,8 @@ pm_help() {
             "\nPM will exit, returning one of the follow values:\n\n"\
             "     0      Everything went fine.\n"\
             "     1      Incorrect syntax, or missing argument.\n"\
-            "     2      The requested port does not exist.\n"
+            "     2      The requested port does not exist.\n"\
+            "     3      Incorrect privileges.\n"
 }
 
 if [[ -z "$1" ]]; then
@@ -130,6 +139,7 @@ shift $(( $OPTIND - 1 ))
 
 case "$1" in
     install)
+        pm_checkprivileges
         if [ -z "$2" ]; then
             usage ; exit 1
         fi
@@ -155,6 +165,7 @@ case "$1" in
         
         
     deinstall)
+        pm_checkprivileges
         if [ "$2" == "" ]; then
             usage ; exit 1
         fi
@@ -203,6 +214,7 @@ case "$1" in
         relnum=`uname -r |cut -c 1`
         if [ ! -e "${basepath}/INDEX-${relnum}.db" ]; then
             echo "You haven't got a INDEX-${relnum}.db file, let me download it for you.";
+            pm_checkprivileges
             cd ${basepath}
             /usr/bin/make fetchindex
         fi

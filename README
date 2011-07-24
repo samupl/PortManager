@@ -1,2 +1,28 @@
 PM (PortManager) is a bash wrapper for FreeBSD ports system. It allows  
 you to manage your applications from a single tool.
+
+EXAMPLE USAGE
+
+  Install a new app:
+
+    pm install irc/irssi
+    pm install www/apache22
+
+
+  Remove a app:
+
+    pm deinstall irc/irssi
+    pm deinstall www/apache22
+
+
+  Search for all IRC related apps:
+
+    pm -nk search irc
+
+  Show all packages, that are not required by any other installed packages:
+
+    pm -l rmunused
+
+  Update the ports tree:
+
+    pm update cvsup.pl.freebsd.org
