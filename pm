@@ -29,7 +29,7 @@
 #
 # syntax and help availble after invoking `pm -h`.
 
-pm_version=0.1.3
+pm_version=0.1.31
 basepath="/usr/ports"
 uid=`whoami`
 
