@@ -29,7 +29,7 @@
 #
 # syntax and help availble after invoking `pm -h`.
 
-pm_version=0.1.2
+pm_version=0.1.3
 basepath="/usr/ports"
 
 usage() {
@@ -38,6 +38,7 @@ usage() {
             "      pm [-c] deinstall port\n"\
             "      pm [-l] rmunused\n"\
             "      pm [-n|-k] search phrase\n"\
+            "      pm show port\n"\
             "      pm update mirror\n"
 }
 
@@ -70,7 +71,8 @@ pm_help() {
 			"    deinstall  Remove the installed port.\n\n"\
 			"    rmunused   Remove all unused ports - mostly left dependencies.\n"\
 			"    search     Search the ports database for a phrase specified.\n"\
-            "    update     Update the ports tree from the mirror specified."
+            "    update     Update the ports tree from the mirror specified.\n"\
+            "    show       Show description and version of a specified port."
 	echo -e \
 			"\nPM accepts following switches as it's first argument:\n\n"\
             "    -c      Clean the workdir after the compilation (or deinstallation) is\n"\
@@ -195,14 +197,21 @@ case "$1" in
 			usage ; exit 1
 		fi
 		if [[ "$pm_s_name" != 1 && "$pm_s_key" != 1 ]]; then
+            echo "You have to give at least one flag: -n, -k"
 			usage ; exit 1
 		fi
+        relnum=`uname -r |cut -c 1`
+        if [ ! -e "${basepath}/INDEX-${relnum}.db" ]; then
+            echo "You haven't got a INDEX-${relnum}.db file, let me download it for you.";
+            cd ${basepath}
+            /usr/bin/make fetchindex
+        fi
 		makecmd="/usr/bin/make search"
 		if [ "$pm_s_name" == 1 ]; then
-			makecmd="$makecmd name=\"$2\""
+			makecmd+=" name=\"$2\""
 		fi
 		if [ "$pm_s_key" == 1 ]; then
-			makecmd="$makecmd key=\"$2\""
+			makecmd+=" key=\"$2\""
 		fi
 		cd $basepath
 		eval $makecmd |egrep "Port|Path|Info" |sed -e "s/\(Info:.*\)/\1\\
